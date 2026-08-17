@@ -1,0 +1,28 @@
+# Not part of this repo (see cmers_backend and cmers_dashboard for their own scope)
+Credientials/
+report_assets/
+.claude/
+
+# Backed-up old .git directory from cmers_backend (renamed, not deleted, when this
+# monorepo was created) -- never track git-internal files as regular content.
+cmers_backend/.git.bak/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.log

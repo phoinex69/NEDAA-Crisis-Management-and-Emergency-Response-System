@@ -1,0 +1,12 @@
+import { useAuthStore } from '../store/authStore';
+
+export function useAuth() {
+  const account = useAuthStore((state) => state.account);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const error = useAuthStore((state) => state.error);
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
+
+  return { account, isAuthenticated, isLoading, error, login, logout };
+}

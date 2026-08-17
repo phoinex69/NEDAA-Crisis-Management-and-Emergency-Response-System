@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.DS_Store
+db.sqlite3
+media/
+staticfiles/
+*.log
+.venv/
+node_modules/
+FRONTEND_GUIDE.md
+osrm_data/

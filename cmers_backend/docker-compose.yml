@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_DB: cmers_db
+      POSTGRES_USER: cmers_user
+      POSTGRES_PASSWORD: cmers_pass
+    volumes:
+      - cmers_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cmers_user -d cmers_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    networks:
+      - cmers_network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - cmers_network
+
+  osrm:
+    image: osrm/osrm-backend:latest
+    command: osrm-routed --algorithm mld /data/syria-latest.osrm --max-table-size 10000
+    volumes:
+      - ./osrm_data:/data
+    ports:
+      - "5000:5000"
+    networks:
+      - cmers_network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/backend
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - cmers_network
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/backend
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - backend
+      - redis
+      - db
+    env_file:
+      - .env
+    networks:
+      - cmers_network
+
+volumes:
+  cmers_postgres_data:
+
+networks:
+  cmers_network:
+    name: cmers_network
