@@ -1,16 +1,48 @@
-# React + Vite
+# NEDAA Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+### Crisis Management and Emergency Response System — Operator Web Dashboard
 
-Currently, two official plugins are available:
+> This is the React/Vite frontend half of NEDAA. For the overall project (including the Django
+> backend) see the [repository root README](../README.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Bilingual (English/Arabic, full RTL) operator dashboard for reviewing live incidents on a map,
+confirming or overriding AI dispatch suggestions, tracking field units in real time,
+broadcasting emergency alerts, and reviewing analytics and audit logs.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19 · Vite · Ant Design · Zustand · react-leaflet · Recharts · native WebSocket
 
-## Expanding the Oxlint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```powershell
+copy .env.example .env
+npm install
+npm run dev
+```
+
+Requires the [backend](../cmers_backend) to be running first — see its `.env` for
+`CORS_ALLOWED_ORIGINS` and make sure it includes this app's dev URL.
+
+## Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build (`dist/`) |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | Lint with oxlint |
+
+## Pages
+
+Dashboard · Incidents · Dispatch Center · Field Units · Analytics · Notifications · Audit Logs ·
+Settings — full description of each in the [repository root README](../README.md#key-features).
+
+## Notable features
+
+- **Demo Mode** (admin-only, top bar): simulates live citizen activity automatically for
+  presentations — see the [root README](../README.md#demo-mode-live-defensedemo-simulation).
+- **Language toggle** (EN/AR): flips the entire UI direction via Ant Design's `ConfigProvider`,
+  preference saved to `localStorage`.
+- Role-gated UI (admin/operator/viewer) that mirrors the backend's actual permissions rather
+  than just hiding buttons client-side.

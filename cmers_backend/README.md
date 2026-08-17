@@ -1,18 +1,22 @@
-# NEDAA — نظام إدارة الأزمات والاستجابة للطوارئ
-# Crisis Management and Emergency Response System
+# NEDAA Backend — نظام إدارة الأزمات والاستجابة للطوارئ
+
+### Crisis Management and Emergency Response System — API service
+
+> This is the Django/DRF/PostGIS backend half of NEDAA. For the overall project (including the
+> React dashboard) see the [repository root README](../README.md).
 
 ## Description
 
-NEDAA is a backend system for coordinating emergency response during crises. Citizens report
-incidents (fire, medical emergencies, accidents, SOS alerts, witness statements) through a
-mobile-facing API, and an AI pipeline automatically clusters nearby reports into incidents,
-scores their credibility (Random Forest), predicts severity (XGBoost), and suggests the nearest
-available field unit using a greedy dispatch algorithm with real road-network ETAs from a
-self-hosted OSRM instance running a Syria map extract. Officials (admins, operators, viewers)
-use a separate authentication system to review incidents, confirm or override AI dispatch
-suggestions, track units live over WebSockets, and review analytics — response times, a live
-heatmap, unit performance, and AI accuracy against ground truth. Every sensitive action is
-audit-logged, rate-limited, and RBAC-enforced between the citizen and official token spaces.
+NEDAA's backend coordinates emergency response during crises. Citizens report incidents (fire,
+medical emergencies, accidents, SOS alerts, witness statements) through a mobile-facing API, and
+an AI pipeline automatically clusters nearby reports into incidents, scores their credibility
+(Random Forest), predicts severity (XGBoost), and suggests the nearest available field unit
+using a greedy dispatch algorithm with real road-network ETAs from a self-hosted OSRM instance
+running a Syria map extract. Officials (admins, operators, viewers) use a separate
+authentication system to review incidents, confirm or override AI dispatch suggestions, track
+units live over WebSockets, and review analytics — response times, a live heatmap, unit
+performance, and AI accuracy against ground truth. Every sensitive action is audit-logged,
+rate-limited, and RBAC-enforced between the citizen and official token spaces.
 
 ## Prerequisites
 
@@ -22,16 +26,10 @@ audit-logged, rate-limited, and RBAC-enforced between the citizen and official t
 
 ## First-time setup
 
-Run these from PowerShell.
+Run these from PowerShell, inside this folder (`cmers_backend/`).
 
 ```powershell
-# 1. Clone the repository
-git clone <repo-url>
-
-# 2. Enter the backend project folder
-cd cmers_backend
-
-# 3. Download the Syria OSM map extract (~78MB)
+# 1. Download the Syria OSM map extract (~78MB)
 Invoke-WebRequest `
   -Uri "https://download.geofabrik.de/asia/syria-latest.osm.pbf" `
   -OutFile "osrm_data/syria-latest.osm.pbf"
