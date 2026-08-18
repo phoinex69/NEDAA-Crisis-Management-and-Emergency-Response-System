@@ -20,7 +20,7 @@ urlpatterns = [
          name='medical-profile'),
     path('profile/emergency-contacts/',
          views.EmergencyContactListView.as_view(), name='emergency-contacts'),
-    path('profile/emergency-contacts/<uuid:pk>/',
+    path('profile/emergency-contacts/<int:pk>/',
          views.EmergencyContactDetailView.as_view(),
          name='emergency-contact-detail'),
 
