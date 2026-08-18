@@ -1,8 +1,3 @@
-from datetime import timedelta
-
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import D
-from django.utils import timezone
 from routing.services import get_osm_link
 
 from websocket.events import broadcast_citizen_report_update, broadcast_danger_zone
@@ -28,7 +23,7 @@ def notify_citizen(user, type, title, message, report=None):
 
 
 def broadcast_alert(type, title, message, latitude, longitude, radius_km, created_by):
-    from reports.models import Report
+    from users.models import User
 
     Notification.objects.create(
         recipient=None,
@@ -41,34 +36,34 @@ def broadcast_alert(type, title, message, latitude, longitude, radius_km, create
         target_radius_km=radius_km,
     )
 
-    count = 0
-    if latitude is not None and longitude is not None:
-        since = timezone.now() - timedelta(hours=24)
-        point = Point(longitude, latitude)
-        citizen_ids = (
-            Report.objects.filter(
-                created_at__gte=since,
-                reporter__isnull=False,
-                location__dwithin=(point, D(km=radius_km)),
-            )
-            .order_by()
-            .values_list('reporter_id', flat=True)
-            .distinct()
-        )
+    # There's no live citizen-location tracking in this system (the app only
+    # ever sends a location alongside a report submission) -- targeting by
+    # "reported near here in the last 24h" silently notifies nobody the
+    # moment report history is thin (e.g. right after a data reset, or for
+    # an area nobody has reported from yet), even though citizens actually
+    # near the danger zone are on the app right now. Broadcasting to every
+    # verified citizen is the safe default for an emergency alert.
+    # Not filtered by is_verified/otp_verified -- an emergency broadcast
+    # (danger zone, road closure, weather) is a safety message, not a
+    # trust-gated feature, and is_verified in particular is never actually
+    # set by the normal registration/OTP flow, so filtering on it would
+    # silently exclude every real citizen account.
+    citizen_ids = User.objects.values_list('id', flat=True)
 
-        for user_id in citizen_ids:
-            Notification.objects.create(
-                recipient_id=user_id,
-                notification_type=type,
-                title=title,
-                message=message,
-                is_broadcast=False,
-            )
-            count += 1
+    count = 0
+    for user_id in citizen_ids:
+        Notification.objects.create(
+            recipient_id=user_id,
+            notification_type=type,
+            title=title,
+            message=message,
+            is_broadcast=False,
+        )
+        count += 1
 
     broadcast_danger_zone(title, message, latitude, longitude, radius_km)
 
-    print(f'[BROADCAST] type={type} sent to {count} citizens within {radius_km}km of {latitude},{longitude}')
+    print(f'[BROADCAST] type={type} sent to {count} citizens')
     return count
 
 

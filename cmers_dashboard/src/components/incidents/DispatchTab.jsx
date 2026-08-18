@@ -1,5 +1,5 @@
 import { App, Button, Empty, List, Spin, Tag, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   completeAssignment,
   confirmDispatch,
@@ -42,9 +42,40 @@ export default function DispatchTab({ incident, onDispatchAction }) {
       .finally(() => setLoading(false));
   }
 
+  // Tracked outside React state so the polling interval below can check the
+  // latest value without needing `assignment` in its dependency array (which
+  // would tear down and recreate the interval, resetting the attempt count,
+  // every time refetch() toggles `loading`).
+  const assignmentRef = useRef(assignment);
+  useEffect(() => {
+    assignmentRef.current = assignment;
+  }, [assignment]);
+
   useEffect(() => {
     refetch();
     setShowOverride(false);
+
+    // The AI pipeline (credibility + severity scoring, then greedy unit
+    // suggestion) runs asynchronously a few seconds after the incident is
+    // created -- if this tab is opened before it finishes, the one-shot
+    // refetch above finds no assignment yet and previously just sat on
+    // "AI pipeline processing..." forever with only a manual Refresh button.
+    // Poll for a bit so it picks up the suggestion on its own once it lands.
+    let attempts = 0;
+    const timer = setInterval(() => {
+      if (assignmentRef.current) {
+        clearInterval(timer);
+        return;
+      }
+      attempts += 1;
+      if (attempts > 10) {
+        clearInterval(timer);
+        return;
+      }
+      refetch();
+    }, 2000);
+
+    return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incident.id]);
 

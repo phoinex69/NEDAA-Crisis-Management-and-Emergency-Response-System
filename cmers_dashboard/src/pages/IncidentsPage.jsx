@@ -35,6 +35,14 @@ export default function IncidentsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [severityFilter, setSeverityFilter] = useState('');
   const [dateRange, setDateRange] = useState([dayjs().subtract(24, 'hour'), dayjs()]);
+  // Tracks whether the user explicitly picked a date range vs. still on the
+  // default "last 24h" view. The default view's upper bound is a snapshot
+  // taken at mount, so if we always sent it as date_to, any incident created
+  // after that moment would get excluded by every auto-refresh's REST fetch
+  // even though it just arrived live over the WebSocket -- it would flash in
+  // via the socket then vanish on the next 30s poll. Only apply an upper
+  // bound once the user has actually chosen one.
+  const [dateRangeTouched, setDateRangeTouched] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -58,7 +66,7 @@ export default function IncidentsPage() {
     const params = { page_size: 100 };
     if (statusFilter) params.status = statusFilter;
     if (dateRange?.[0]) params.date_from = dateRange[0].toISOString();
-    if (dateRange?.[1]) params.date_to = dateRange[1].toISOString();
+    if (dateRange?.[1] && dateRangeTouched) params.date_to = dateRange[1].toISOString();
     if (debouncedSearch) params.search = debouncedSearch;
     return params;
   }
@@ -131,6 +139,7 @@ export default function IncidentsPage() {
     setStatusFilter('');
     setSeverityFilter('');
     setDateRange([dayjs().subtract(24, 'hour'), dayjs()]);
+    setDateRangeTouched(false);
     setSearchText('');
   }
 
@@ -315,7 +324,10 @@ export default function IncidentsPage() {
         />
         <RangePicker
           value={dateRange}
-          onChange={(range) => setDateRange(range ?? [dayjs().subtract(24, 'hour'), dayjs()])}
+          onChange={(range) => {
+            setDateRange(range ?? [dayjs().subtract(24, 'hour'), dayjs()]);
+            setDateRangeTouched(Boolean(range));
+          }}
           presets={[
             { label: 'Last 24h', value: [dayjs().subtract(24, 'hour'), dayjs()] },
             { label: 'Last 7 days', value: [dayjs().subtract(7, 'day'), dayjs()] },

@@ -40,7 +40,11 @@ def generate_simulated_dataset(n_rows=3000, random_state=42):
     score += np.where(user_false_rate < 0.1, 10, 0)
     score += np.where(user_false_rate > 0.3, -20, 0)
     score += np.where(is_witness_mode == 1, 10, 0)
-    score += np.where(submission_method == 1, -15, 0)
+    # SOS is a deliberate, hard-to-fake emergency signal -- it should boost
+    # credibility, not penalize it (this used to be -15, which is why SOS
+    # reports were landing in the yellow band and never getting an automatic
+    # dispatch suggestion).
+    score += np.where(submission_method == 1, 20, 0)
     score += np.where(submission_method == 0, 5, 0)
 
     label = (score >= 50).astype(int)

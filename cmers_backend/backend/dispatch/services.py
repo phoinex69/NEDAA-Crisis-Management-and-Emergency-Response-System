@@ -114,6 +114,28 @@ def complete_assignment(assignment):
     unit.status = 'available'
     unit.save(update_fields=['status'])
 
+    # Without this, a citizen's report status gets stuck at 'assigned'
+    # forever -- nothing else in the dispatch flow ever marks it resolved,
+    # so the app has no further status change to pick up on its next poll.
+    if assignment.cluster:
+        for report in assignment.cluster.source_reports.all():
+            report.status = 'resolved'
+            report.save(update_fields=['status'])
+            notify_report_status_change(report)
+
+        # Same gap at the cluster level -- nothing else ever moves a cluster
+        # out of 'active'/'assigned', so a fully-handled incident stayed
+        # indistinguishable from an in-progress one on the incidents list.
+        # Only close it once every assignment tied to it is done (a cluster
+        # can have more than one, e.g. after an override).
+        cluster = assignment.cluster
+        still_open = cluster.resource_assignments.exclude(status__in=['completed', 'cancelled', 'overridden']).exists()
+        if not still_open:
+            cluster.status = 'closed'
+            cluster.closed_at = timezone.now()
+            cluster.save(update_fields=['status', 'closed_at'])
+            broadcast_incident_updated(cluster)
+
     broadcast_dispatch_event(assignment)
     broadcast_unit_location(unit)
     return assignment
