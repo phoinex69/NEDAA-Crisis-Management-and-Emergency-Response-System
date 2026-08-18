@@ -272,6 +272,9 @@ export default function IncidentsPage() {
           </Title>
           <Text type="secondary">
             Showing {visibleIncidents.length} of {totalCount} incidents
+            {!statusFilter && totalCount > visibleIncidents.length && (
+              <> ({totalCount - visibleIncidents.length} closed hidden — select "Closed" above to view)</>
+            )}
           </Text>
         </div>
         <div style={{ textAlign: 'right' }}>

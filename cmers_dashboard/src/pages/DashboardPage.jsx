@@ -5,7 +5,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import { Badge, Typography } from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getStats } from '../api/analytics.api';
 import IncidentCard from '../components/incidents/IncidentCard';
@@ -99,7 +99,6 @@ export default function DashboardPage() {
   const incidents = useIncidentStore((state) => state.incidents);
   const fetchIncidents = useIncidentStore((state) => state.fetchIncidents);
   const units = useUnitStore((state) => state.units);
-  const bannerRef = useRef(null);
 
   const [selectedIncidentId, setSelectedIncidentId] = useState(null);
   const [avgResponseTime, setAvgResponseTime] = useState(null);
@@ -138,46 +137,6 @@ export default function DashboardPage() {
 
   return (
     <div>
-      {/* Live incident counter */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <span
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            background: activeIncidents.length > 0 ? COLORS.credibility.red : COLORS.credibility.green,
-          }}
-          className={activeIncidents.length > 0 ? 'pulse-critical' : ''}
-        />
-        <Text strong style={{ color: activeIncidents.length > 0 ? COLORS.credibility.red : COLORS.credibility.green }}>
-          {activeIncidents.length > 0 ? `${activeIncidents.length} active incidents` : 'All clear'}
-        </Text>
-      </div>
-
-      {/* Critical incident banner */}
-      {criticalCount > 0 && (
-        <div
-          ref={bannerRef}
-          onClick={() => navigate('/incidents?severity=4')}
-          className="fade-in"
-          style={{
-            background: '#DC2626',
-            color: '#fff',
-            borderRadius: 8,
-            padding: '12px 20px',
-            marginBottom: 16,
-            cursor: 'pointer',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-          }}
-        >
-          <WarningOutlined />
-          ⚠ {criticalCount} Critical Incident{criticalCount > 1 ? 's' : ''} Require Immediate Attention
-        </div>
-      )}
-
       {/* Row 1 — stat cards */}
       <div
         style={{
