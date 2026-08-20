@@ -131,6 +131,9 @@ NEDAA-Crisis-Management-and-Emergency-Response-System/
 
 ## Getting started
 
+> Already set up and just need to bring the stack back up? See [STARTUP.md](STARTUP.md) for the
+> condensed quick-start.
+
 ### 1. Clone
 
 ```powershell
