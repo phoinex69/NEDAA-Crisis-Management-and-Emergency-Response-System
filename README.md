@@ -9,12 +9,13 @@ bilingual (English/Arabic, full RTL) operator dashboard to review live incidents
 confirm or override AI dispatch suggestions, track field units in real time, broadcast
 emergency alerts, and audit every action taken in the system.
 
-This repository is a monorepo containing both halves of the system:
+This repository is a monorepo containing all three parts of the system:
 
 | Folder | What it is | Stack |
 |---|---|---|
 | [`cmers_backend/`](cmers_backend) | REST API, AI pipeline, WebSocket server | Django, DRF, PostGIS, Channels, Celery, Redis, OSRM |
 | [`cmers_dashboard/`](cmers_dashboard) | Operator web dashboard | React, Vite, Ant Design, Zustand, Leaflet |
+| [`cmers_mobile/`](cmers_mobile) | Citizen-facing app ("Nidaa") | Flutter, GetX, MVC |
 
 ---
 

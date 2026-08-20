@@ -18,6 +18,20 @@ node_modules/
 dist/
 dist-ssr/
 
+# Flutter/Dart (cmers_mobile)
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+cmers_mobile/build/
+cmers_mobile/coverage/
+cmers_mobile/android/.gradle/
+cmers_mobile/android/local.properties
+cmers_mobile/android/app/debug/
+cmers_mobile/android/app/profile/
+cmers_mobile/android/app/release/
+*.iml
+
 # Env / secrets
 .env
 .env.*

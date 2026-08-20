@@ -40,14 +40,23 @@ Open http://localhost:3000
 
 ## 3. Mobile app (optional)
 
-Only needed if you're testing the citizen-facing app on a physical device or emulator.
+Only needed if you're testing the citizen-facing app. Requires the [Flutter SDK](https://flutter.dev).
 
-1. Connect the device via USB and enable USB debugging when prompted.
-2. Forward the backend port to the device:
-   ```bash
-   adb reverse tcp:8000 tcp:8000
-   ```
-3. Launch the app (see the mobile app's own README for build instructions).
+```bash
+cd cmers_mobile
+flutter pub get
+flutter run
+```
+
+By default it points at `http://127.0.0.1:8000/api/v1` (see `lib/core/config/app_config.dart`).
+
+- **Android emulator**: change the host to `10.0.2.2` instead of `127.0.0.1`.
+- **Physical device**: connect via USB, enable USB debugging, then forward the backend port:
+  ```bash
+  adb reverse tcp:8000 tcp:8000
+  ```
+
+See [`cmers_mobile/README.md`](cmers_mobile/README.md) for the full architecture and setup notes.
 
 ## Demo accounts
 
